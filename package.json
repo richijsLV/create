@@ -1,0 +1,16 @@
+{
+  "name": "eldora-ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A polished, executor-friendly Roblox UI library with a TypeScript documentation site.",
+  "scripts": {
+    "docs:dev": "vite --config docs/vite.config.ts",
+    "docs:build": "vite build --config docs/vite.config.ts",
+    "docs:preview": "vite preview --config docs/vite.config.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19"
+  }
+}
+
