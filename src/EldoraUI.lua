@@ -379,21 +379,22 @@ function Window:_trackCleanup(item)
     return item
 end
 
-function Window:_buildChrome()
-    local overlay = create("Frame", {
-        Name = "Overlay",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromScale(1, 1),
-        Parent = self.ScreenGui,
-    })
+local overlay = create("Frame", {
+    Name = "Overlay",
+    BackgroundTransparency = 1,
+    Size = UDim2.fromScale(1, 1),
+    Active = false,
+    Parent = self.ScreenGui,
+})
 
-    local backdrop = create("Frame", {
-        Name = "Backdrop",
-        BackgroundColor3 = self.Theme.Background,
-        BackgroundTransparency = 0.24,
-        Size = UDim2.fromScale(1, 1),
-        Parent = overlay,
-    })
+local backdrop = create("Frame", {
+    Name = "Backdrop",
+    BackgroundColor3 = self.Theme.Background,
+    BackgroundTransparency = 0.24,
+    Size = UDim2.fromScale(1, 1),
+    Active = false,
+    Parent = overlay,
+})
     self:_trackTheme(function(theme)
         backdrop.BackgroundColor3 = theme.Background
     end)
@@ -843,6 +844,7 @@ function Window:ToggleVisible(state)
 
     self.Visible = state
     self.Main.Visible = true
+    self.Overlay.Visible = true
 
     if state then
         self.Main.Visible = true
@@ -852,15 +854,24 @@ function Window:ToggleVisible(state)
         tween(self.Main, 0.22, { BackgroundTransparency = 0 })
         tween(self.Sidebar, 0.22, { Position = UDim2.new(0, 0, 0, 0) })
         tween(self.PageHolder, 0.22, { Position = UDim2.new(0, 266, 0, 0) })
+        -- Ensure overlay backdrop is visible
+        tween(self.Overlay:FindFirstChild("Backdrop") or self.Overlay, 0.22, { BackgroundTransparency = 0.24 })
         return
     end
 
+    local overlayBackdrop = self.Overlay:FindFirstChild("Backdrop")
+    if overlayBackdrop then
+        tween(overlayBackdrop, 0.18, { BackgroundTransparency = 1 }, Enum.EasingStyle.Quad)
+    end
+    
     local fadeTween = tween(self.Main, 0.18, { BackgroundTransparency = 1 }, Enum.EasingStyle.Quad)
     tween(self.Sidebar, 0.18, { Position = UDim2.new(0, -24, 0, 0) }, Enum.EasingStyle.Quad)
     tween(self.PageHolder, 0.18, { Position = UDim2.new(0, 294, 0, 0) }, Enum.EasingStyle.Quad)
+    
     fadeTween.Completed:Wait()
     if not self.Visible and not self.Destroyed then
         self.Main.Visible = false
+        self.Overlay.Visible = false  -- This is the key addition: hide the entire overlay
     end
 end
 
